@@ -20,10 +20,11 @@ export function usePortify() {
   useEffect(() => save("portify_session", user), [user]);
 
   function logout() { setUser(null); navigate("/"); }
-  function login(email, password) {
-    if (email === "admin@portify.com" && password === "admin123") {
+  function login(email, password, adminOnly = false) {
+    if (adminOnly && email === "admin@portify.com" && password === "admin123") {
       const admin = { name: "Admin", email, role: "admin" }; setUser(admin); save("portify_session", admin); navigate("/admin"); return { ok: true };
     }
+    if (adminOnly) return { ok: false, message: "Invalid admin credentials." };
     const users = read("portify_users", []);
     const found = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
     if (!found) return { ok: false, message: "Account not found or password is incorrect. Please sign up first." };
